@@ -95,8 +95,8 @@
           "due": [
             {
               "reference": "dob",
-              "offset": "+42d",
-              "window": "+10d"
+              "offset": "+37d", //Alow the giving of vaccines up to 5 days earlier than the actual date.
+              "window": "+15d"
             }
           ],
           "expiry": [
@@ -125,8 +125,8 @@
           "due": [
             {
               "reference": "dob",
-              "offset": "+42d",
-              "window": "+10d"
+              "offset": "+37d",
+              "window": "+15d"
             }
           ],
           "expiry": [
@@ -155,8 +155,8 @@
           "due": [
             {
               "reference": "dob",
-              "offset": "+42d",
-              "window": "+10d"
+              "offset": "+37d",
+              "window": "+15d"
             }
           ],
           "expiry": [
@@ -185,8 +185,8 @@
           "due": [
             {
               "reference": "dob",
-              "offset": "+42d",
-              "window": "+10d"
+              "offset": "+37d",
+              "window": "+15d"
             }
           ],
           "expiry": [
@@ -223,8 +223,8 @@
             {
               "reference": "prerequisite",
               "prerequisite": "OPV 1",
-              "offset": "+28d",
-              "window": "+10d"
+              "offset": "+23d",
+              "window": "+15d"
             }
           ],
           "expiry": [
@@ -254,8 +254,8 @@
             {
               "reference": "prerequisite",
               "prerequisite": "Penta 1",
-              "offset": "+28d",
-              "window": "+10d"
+              "offset": "+23d",
+              "window": "+15d"
             }
           ],
           "expiry": [
@@ -285,8 +285,8 @@
             {
               "reference": "prerequisite",
               "prerequisite": "PCV 1",
-              "offset": "+28d",
-              "window": "+10d"
+              "offset": "+23d",
+              "window": "+15d"
             }
           ],
           "expiry": [
@@ -316,8 +316,8 @@
             {
               "reference": "prerequisite",
               "prerequisite": "Rota 1",
-              "offset": "+28d",
-              "window": "+10d"
+              "offset": "+23d",
+              "window": "+15d"
             }
           ],
           "expiry": [
@@ -354,8 +354,8 @@
             {
               "reference": "prerequisite",
               "prerequisite": "OPV 2",
-              "offset": "+28d",
-              "window": "+10d"
+              "offset": "+23d",
+              "window": "+15d"
             }
           ],
           "expiry": [
@@ -385,8 +385,8 @@
             {
               "reference": "prerequisite",
               "prerequisite": "Penta 2",
-              "offset": "+28d",
-              "window": "+10d"
+              "offset": "+23d",
+              "window": "+15d"
             }
           ],
           "expiry": [
@@ -416,8 +416,8 @@
             {
               "reference": "prerequisite",
               "prerequisite": "PCV 2",
-              "offset": "+28d",
-              "window": "+10d"
+              "offset": "+23d",
+              "window": "+15d"
             }
           ],
           "expiry": [
@@ -455,8 +455,8 @@
             "due": [
               {
                 "reference": "dob",
-                "offset": "+9m",
-                "window": "+10d"
+                "offset": "+266d",
+                "window": "+15d"
               }
             ],
             "conditions": [
@@ -501,7 +501,7 @@
           "due": [
             {
               "reference": "dob",
-              "offset": "+9m",
+              "offset": "+266d",
               "window": "+10d"
             }
           ],
@@ -553,7 +553,7 @@
               {
                 "reference": "prerequisite",
                 "prerequisite": "Measles 1",
-                "offset": "+9m",
+                "offset": "+266d",
                 "window": "+10d"
               },
               {
