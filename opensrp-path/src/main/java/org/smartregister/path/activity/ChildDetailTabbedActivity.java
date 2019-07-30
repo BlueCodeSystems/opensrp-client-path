@@ -42,6 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -111,6 +112,8 @@ import util.AsyncTaskUtils;
 import util.ImageUtils;
 import util.JsonFormUtils;
 import util.PathConstants;
+import static org.smartregister.util.Utils.dobStringToDate;
+
 
 import static org.smartregister.util.Utils.getValue;
 
@@ -393,12 +396,17 @@ public class ChildDetailTabbedActivity extends BaseActivity implements Vaccinati
     }
 
     private String getmetaDataForEditForm() {
+
         try {
             JSONObject form = FormUtils.getInstance(getApplicationContext()).getFormJson("child_enrollment");
             LocationPickerView lpv = new LocationPickerView(getApplicationContext());
             lpv.init();
             JsonFormUtils.addChildRegLocHierarchyQuestions(form);
             Log.d(TAG, "Form is " + form.toString());
+            //Get the days since registration
+            DateTime registrationDate = DateTime.parse(this.detailsMap.get("client_reg_date"));
+            long daysSinceRegistration = new Duration(registrationDate, DateTime.now()).getStandardDays();
+
             if (form != null) {
                 form.put(JsonFormUtils.ENTITY_ID, childDetails.entityId());
                 form.put(JsonFormUtils.RELATIONAL_ID, childDetails.getColumnmaps().get("relational_id"));
@@ -419,8 +427,12 @@ public class ChildDetailTabbedActivity extends BaseActivity implements Vaccinati
                     if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase("Last_Name")) {
                         jsonObject.put(JsonFormUtils.VALUE, getValue(childDetails.getColumnmaps(), "last_name", true));
                     }
-                    if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase("Sex")) {
-                        jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                    if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase("Sex")){
+                        if (daysSinceRegistration > 42) {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        } else {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, false);
+                        }
                         jsonObject.put(JsonFormUtils.VALUE, getValue(childDetails.getColumnmaps(), "gender", true));
                     }
                     if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase(JsonFormUtils.ZEIR_ID)) {
@@ -431,7 +443,11 @@ public class ChildDetailTabbedActivity extends BaseActivity implements Vaccinati
                         jsonObject.put(JsonFormUtils.VALUE, getValue(detailsMap, "Child_Register_Card_Number", true));
                     }
                     if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase("Child_Birth_Certificate")) {
-                        jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        if (daysSinceRegistration > 42) {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        } else {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, false);
+                        }
                         jsonObject.put(JsonFormUtils.VALUE, getValue(detailsMap, "Child_Birth_Certificate", true));
                     }
                     if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase("Mother_Guardian_First_Name")) {
@@ -466,15 +482,27 @@ public class ChildDetailTabbedActivity extends BaseActivity implements Vaccinati
                         jsonObject.put(JsonFormUtils.VALUE, getValue(detailsMap, "Mother_Guardian_Number", true));
                     }
                     if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase("Father_Guardian_Name")) {
-                        jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        if (daysSinceRegistration > 42) {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        } else {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, false);
+                        }
                         jsonObject.put(JsonFormUtils.VALUE, getValue(detailsMap, "Father_Guardian_Name", true));
                     }
                     if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase("Father_Guardian_NRC")) {
-                        jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        if (daysSinceRegistration > 42) {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        } else {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, false);
+                        }
                         jsonObject.put(JsonFormUtils.VALUE, getValue(detailsMap, "Father_NRC_Number", true));
                     }
                     if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase("First_Health_Facility_Contact")) {
-                        jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        if (daysSinceRegistration > 42) {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        } else {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, false);
+                        }
                         String dateString = getValue(detailsMap, "First_Health_Facility_Contact", false);
                         if (!TextUtils.isEmpty(dateString)) {
                             Date date = JsonFormUtils.formatDate(dateString, false);
@@ -484,8 +512,11 @@ public class ChildDetailTabbedActivity extends BaseActivity implements Vaccinati
                         }
                     }
                     if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase("Date_Birth")) {
-                        jsonObject.put(JsonFormUtils.READ_ONLY, true);
-
+                        if (daysSinceRegistration > 42) {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        } else {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, false);
+                        }
                         String dobString = getValue(childDetails.getColumnmaps(), PathConstants.EC_CHILD_TABLE.DOB, true);
                         Date dob = util.Utils.dobStringToDate(dobString);
                         if (dob != null) {
@@ -493,11 +524,19 @@ public class ChildDetailTabbedActivity extends BaseActivity implements Vaccinati
                         }
                     }
                     if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase("Birth_Weight")) {
-                        jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        if (daysSinceRegistration > 42) {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        } else {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, false);
+                        }
                         jsonObject.put(JsonFormUtils.VALUE, getValue(detailsMap, "Birth_Weight", true));
                     }
                     if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase("Place_Birth")) {
-                        jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        if (daysSinceRegistration > 42) {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        } else {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, false);
+                        }
 
                         String placeofnearth_Choice = getValue(detailsMap, "Place_Birth", true);
                         if (placeofnearth_Choice.equalsIgnoreCase("Health facility")) {
@@ -511,7 +550,11 @@ public class ChildDetailTabbedActivity extends BaseActivity implements Vaccinati
 //                        jsonObject.put(JsonFormUtils.VALUE, getValue(detailsMap, "Place_Birth", true));
                     }
                     if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase("Birth_Facility_Name")) {
-                        jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        if (daysSinceRegistration > 42) {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        } else {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, false);
+                        }
                         List<String> birthFacilityHierarchy = null;
                         String birthFacilityName = getValue(detailsMap, "Birth_Facility_Name", false);
 
@@ -532,7 +575,11 @@ public class ChildDetailTabbedActivity extends BaseActivity implements Vaccinati
                     }
                     if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase("Birth_Facility_Name_Other")) {
                         jsonObject.put(JsonFormUtils.VALUE, getValue(detailsMap, "Birth_Facility_Name_Other", false));
-                        jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        if (daysSinceRegistration > 42) {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        } else {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, false);
+                        }
                     }
                     if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase("Residential_Area")) {
                         List<String> residentialAreaHierarchy;
@@ -566,7 +613,11 @@ public class ChildDetailTabbedActivity extends BaseActivity implements Vaccinati
                         jsonObject.put(JsonFormUtils.VALUE, getValue(detailsMap, "CHW_Phone_Number", true));
                     }
                     if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase("PMTCT_Status")) {
-                        jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        if (daysSinceRegistration > 42) {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, true);
+                        } else {
+                            jsonObject.put(JsonFormUtils.READ_ONLY, false);
+                        }
                         jsonObject.put(JsonFormUtils.VALUE, getValue(detailsMap, PMTCT_STATUS_LOWER_CASE, true));
                     }
                     if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase("Home_Facility")) {
