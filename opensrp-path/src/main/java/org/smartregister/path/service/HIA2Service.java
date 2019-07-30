@@ -1110,7 +1110,8 @@ public class HIA2Service {
     }
 
     private String ageQuery() {
-        return " CAST ((julianday('now') - julianday(strftime('%Y-%m-%d',child.dob)))/(365/12) AS INTEGER)as age ";
+        final String query = " (CAST (strftime('%Y-%m-%d', 'now') - strftime('%Y-%m-%d', child.dob) as INTEGER)) as age ";
+        return query;
     }
 
     private String eventDateEqualsCurrentMonthQuery() {
