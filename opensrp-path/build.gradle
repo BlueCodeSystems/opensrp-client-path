@@ -5,7 +5,7 @@ buildscript {
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:3.1.2"
+        classpath 'com.android.tools.build:gradle:3.3.1'
         classpath 'io.fabric.tools:gradle:1.+'
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2'
     }
@@ -89,9 +89,9 @@ android {
             buildConfigField "int", "DATABASE_VERSION", '15'
             buildConfigField "long", "MAX_SERVER_TIME_DIFFERENCE", "1800000l"
             buildConfigField "boolean", "TIME_CHECK", "false"
-            buildConfigField "int", "AUTO_SYNC_DURATION", '2'
-            buildConfigField "int", "WEIGHT_SYNC_PROCESSING_MINUTES", '3'
-            buildConfigField "int", "VACCINE_SYNC_PROCESSING_MINUTES", '3'
+            buildConfigField "int", "AUTO_SYNC_DURATION", '10'
+            buildConfigField "int", "WEIGHT_SYNC_PROCESSING_MINUTES", '10'
+            buildConfigField "int", "VACCINE_SYNC_PROCESSING_MINUTES", '10'
             buildConfigField "int", "RECURRING_SERVICES_SYNC_PROCESSING_MINUTES", '3'
             buildConfigField "int", "DAILY_TALLIES_GENERATION_MINUTES", '5'
             buildConfigField "int", "COVERAGE_DROPOUT_GENERATION_MINUTES", '5'
@@ -126,6 +126,7 @@ android {
 tasks.withType(Test) {
     jacoco.includeNoLocationClasses = true
 }
+
 
 dependencies {
     implementation 'commons-validator:commons-validator:1.6'

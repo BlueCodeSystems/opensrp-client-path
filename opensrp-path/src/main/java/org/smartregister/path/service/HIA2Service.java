@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import net.sqlcipher.database.SQLiteDatabase;
 
+import org.smartregister.domain.db.EventClient;
 import org.smartregister.immunization.repository.VaccineRepository;
 import org.smartregister.repository.EventClientRepository;
 import org.smartregister.util.Log;
@@ -203,7 +204,7 @@ public class HIA2Service {
         try {
             String query = "select count(*) as count," + ageQuery() + " from ec_child child inner join " + EventClientRepository.Table.event.name() + " e on e." + EventClientRepository.event_column.baseEntityId.name() + "= child.base_entity_id" +
                     " where age " + age + " and  '" + reportDate + "'=strftime('%Y-%m-%d',e.eventDate) and child.gender='" + (gender.isEmpty() ? "Male" : gender + "'");
-            count = executeQueryAndReturnCount(query);
+            count = executeQueryAndReturnCount(query, null);
         } catch (Exception e) {
             Log.logError(TAG, e.getMessage());
         }
@@ -293,7 +294,7 @@ public class HIA2Service {
     private void getCHN1030() {
         try {
             String query = "select count(*) as count from ec_child child inner join event e on e.baseEntityId=child.base_entity_id where e.eventType like '%Out of Area Service%' and " + eventDateEqualsCurrentMonthQuery();
-            int count = executeQueryAndReturnCount(query);
+            int count = executeQueryAndReturnCount(query, null);
             hia2Report.put(CHN1_030, count);
         } catch (Exception e) {
             Log.logError(TAG, "CHN1_030 " + e.getMessage());
@@ -308,7 +309,7 @@ public class HIA2Service {
         try {
             String query = "select count(*) as count," + ageQuery() + " from ec_child child inner join event e on e.baseEntityId=child.base_entity_id " +
                     "where e.eventType like '%Growth Monitoring%' and age <23 and " + eventDateEqualsCurrentMonthQuery();
-            int count = executeQueryAndReturnCount(query);
+            int count = executeQueryAndReturnCount(query, null);
             hia2Report.put(CHN2_005, count);
         } catch (Exception e) {
             Log.logError(TAG, "CHN2_005 " + e.getMessage());
@@ -322,7 +323,7 @@ public class HIA2Service {
         try {
             String query = "select count(*) as count," + ageQuery() + " from ec_child child inner join event e on e.baseEntityId=child.base_entity_id " +
                     "where e.eventType like '%Growth Monitoring%' and age between 24 and 59 and " + eventDateEqualsCurrentMonthQuery();
-            int count = executeQueryAndReturnCount(query);
+            int count = executeQueryAndReturnCount(query, null);
             hia2Report.put(CHN2_010, count);
         } catch (Exception e) {
             Log.logError(TAG, "CHN2_010 " + e.getMessage());
@@ -400,7 +401,7 @@ public class HIA2Service {
                     "FROM weights w INNER JOIN ec_child child ON w.base_entity_id=child.base_entity_id WHERE '"+reportDate+"'=strftime('%Y-%m-%d',datetime(w.date/1000, 'unixepoch'))"+
                     " AND age <= 23 AND w.z_score BETWEEN -3 AND -2);";
 
-            int count = executeQueryAndReturnCount(query);
+            int count = executeQueryAndReturnCount(query, null);
             hia2Report.put(CHN2_035, count);
         } catch (Exception e) {
             Log.logError(TAG, "CHN2_035 " + e.getMessage());
@@ -419,7 +420,7 @@ public class HIA2Service {
                     "FROM weights w INNER JOIN ec_child child ON w.base_entity_id=child.base_entity_id WHERE '"+reportDate+"'=strftime('%Y-%m-%d',datetime(w.date/1000, 'unixepoch'))"+
                     " AND age BETWEEN 24 AND 59 AND w.z_score BETWEEN -3 AND -2);";
 
-            int count = executeQueryAndReturnCount(query);
+            int count = executeQueryAndReturnCount(query, null);
             hia2Report.put(CHN2_040, count);
         } catch (Exception e) {
             Log.logError(TAG, "CHN2_040 " + e.getMessage());
@@ -451,7 +452,7 @@ public class HIA2Service {
             String query = "select count(*) as count," + ageQuery() +
                     "from weights w left join ec_child child on w.base_entity_id=child.base_entity_id" +
                     " where '" + reportDate + "'=strftime('%Y-%m-%d',datetime(w.date/1000, 'unixepoch')) and age<=23 and w.z_score< -3 group by child.base_entity_id;";
-            int count = executeQueryAndReturnCount(query);
+            int count = executeQueryAndReturnCount(query, null);
             hia2Report.put(CHN2_045, count);
         } catch (Exception e) {
             Log.logError(TAG, "CHN2_045 " + e.getMessage());
@@ -466,7 +467,7 @@ public class HIA2Service {
             String query = "select count(*) as count," + ageQuery() +
                     "from weights w left join ec_child child on w.base_entity_id=child.base_entity_id" +
                     " where '" + reportDate + "'=strftime('%Y-%m-%d',datetime(w.date/1000, 'unixepoch')) and age between 24 and 59 and w.z_score < -3 group by child.base_entity_id;";
-            int count = executeQueryAndReturnCount(query);
+            int count = executeQueryAndReturnCount(query, null);
             hia2Report.put(CHN2_050, count);
         } catch (Exception e) {
             Log.logError(TAG, "CHN2_050 " + e.getMessage());
@@ -499,7 +500,7 @@ public class HIA2Service {
                     " FROM weights w INNER JOIN ec_child child ON w.base_entity_id = child.base_entity_id WHERE '"+ reportDate +"'=strftime('%Y-%m-%d',datetime(w.date/1000, 'unixepoch')) "+
                     "AND age <= 23 AND w.z_score > 2);";
 
-            int count = executeQueryAndReturnCount(query);
+            int count = executeQueryAndReturnCount(query, null);
             hia2Report.put(CHN2_055, count);
         } catch (Exception e) {
             Log.logError(TAG, "CHN2_055 " + e.getMessage());
@@ -518,7 +519,7 @@ public class HIA2Service {
                         " FROM weights w INNER JOIN ec_child child ON w.base_entity_id = child.base_entity_id WHERE '"+ reportDate +"'=strftime('%Y-%m-%d',datetime(w.date/1000, 'unixepoch')) "+
                         "AND age BETWEEN 24 AND 59 AND w.z_score > 2);";
 
-            int count = executeQueryAndReturnCount(query);
+            int count = executeQueryAndReturnCount(query, null);
             hia2Report.put(CHN2_060, count);
         } catch (Exception e) {
             Log.logError(TAG, "CHN2_060 " + e.getMessage());
@@ -552,7 +553,7 @@ public class HIA2Service {
                     "FROM recurring_service_records rsr INNER JOIN recurring_service_types rst ON rsr.recurring_service_id = rst._id INNER JOIN ec_child child ON rsr.base_entity_id = child.base_entity_id" +
                     " WHERE rst.type = 'Vit_A' AND '"+reportDate+"' = strftime('%Y-%m-%d',datetime(rsr.date/1000, 'unixepoch')) AND age BETWEEN 6 AND 11);";
 
-            int count = executeQueryAndReturnCount(query);
+            int count = executeQueryAndReturnCount(query, null);
             hia2Report.put(CHN2_065, count);
         } catch (Exception e) {
             Log.logError(TAG, "CHN2_065 " + e.getMessage());
@@ -571,7 +572,7 @@ public class HIA2Service {
                     "FROM recurring_service_records rsr INNER JOIN recurring_service_types rst ON rsr.recurring_service_id = rst._id INNER JOIN ec_child child ON rsr.base_entity_id = child.base_entity_id" +
                     " WHERE rst.type = 'Vit_A' AND '"+reportDate+"' = strftime('%Y-%m-%d',datetime(rsr.date/1000, 'unixepoch')) AND age BETWEEN 12 AND 59);";
 
-            int count = executeQueryAndReturnCount(query);
+            int count = executeQueryAndReturnCount(query, null);
             hia2Report.put(CHN2_070, count);
         } catch (Exception e) {
             Log.logError(TAG, "CHN2_070 " + e.getMessage());
@@ -589,7 +590,7 @@ public class HIA2Service {
                     "FROM recurring_service_records rsr INNER JOIN recurring_service_types rst ON rsr.recurring_service_id = rst._id INNER JOIN ec_child child ON rsr.base_entity_id = child.base_entity_id" +
                     " WHERE rst.type = 'Deworming' AND '"+reportDate+"' = strftime('%Y-%m-%d',datetime(rsr.date/1000, 'unixepoch')) AND age BETWEEN 12 AND 59);";
 
-            int count = executeQueryAndReturnCount(query);
+            int count = executeQueryAndReturnCount(query, null);
             hia2Report.put(CHN2_075, count);
         } catch (Exception e) {
             Log.logError(TAG, "CHN2_075 " + e.getMessage());
@@ -606,7 +607,7 @@ public class HIA2Service {
             String query = "SELECT count(*) AS count FROM recurring_service_records rsr INNER JOIN recurring_service_types rst ON rsr.recurring_service_id = rst._id INNER JOIN ec_child child ON rsr.base_entity_id = child.base_entity_id " +
                     "WHERE rst.type = 'ITN' AND '" + reportDate + "' = strftime('%Y-%m-%d',datetime(rsr.date/1000, 'unixepoch'));";
 
-            int count = executeQueryAndReturnCount(query);
+            int count = executeQueryAndReturnCount(query, null);
             hia2Report.put(CHN2_080, count);
         } catch (Exception e) {
             Log.logError(TAG, "CHN2_080 " + e.getMessage());
@@ -1066,12 +1067,12 @@ public class HIA2Service {
     private int getVaccineCount(String vaccine, String age, boolean outOfArea) {
         int count = 0;
         try {
-
+            //TODO: FIX THIS
             String vaccineCondition = vaccine.contains("measles") ? "(lower(v.name) = '"+vaccine.toLowerCase()+"' OR lower(v.name) = 'mr"+vaccine.substring(vaccine.lastIndexOf('_'))+"');" : "lower(v.name) = '" + vaccine.toLowerCase() + "';";
             String query = "SELECT count(*) AS count, " + ageQuery() + " FROM vaccines v INNER JOIN ec_child child ON child.base_entity_id = v.base_entity_id " +
-                    "WHERE age " + age + " AND '" + reportDate + "' = strftime('%Y-%m-%d',datetime(v.date/1000, 'unixepoch')) AND v.out_of_area = " + (outOfArea ? 1 : 0) + " AND " + vaccineCondition;
+                    "WHERE age "+age+" AND '" + reportDate + "' = strftime('%Y-%m-%d',datetime(v.date/1000, 'unixepoch')) AND v.out_of_area = " + (outOfArea ? 1 : 0) + " AND " + vaccineCondition;
 
-            count = executeQueryAndReturnCount(query);
+            count = executeQueryAndReturnCount(query, null);
         } catch (Exception e) {
             Log.logError(TAG, vaccine.toUpperCase() + e.getMessage());
         }
@@ -1100,7 +1101,7 @@ public class HIA2Service {
                     ") and v." + VaccineRepository.HIA2_STATUS + " = '" + VaccineRepository.HIA2_Within + "' ";
             String query = "select count(*) as count, " + ageQuery() + " from vaccines v left join ec_child child on child.base_entity_id=v.base_entity_id " +
                     "where age " + age + " and  '" + reportDate + "'=strftime('%Y-%m-%d',datetime(v.date/1000, 'unixepoch')) and v.out_of_area=" + (outOfArea ? 1 : 0) + " and " + vaccineCondition;
-            count = executeQueryAndReturnCount(query);
+            count = executeQueryAndReturnCount(query, null);
         } catch (Exception e) {
             Log.logError(TAG, "HIA2_Status" + e.getMessage());
         }
@@ -1118,11 +1119,11 @@ public class HIA2Service {
         return "strftime('%Y-%m-%d',e.eventDate) = '" + reportDate + "'";
     }
 
-    private int executeQueryAndReturnCount(String query) {
+    private int executeQueryAndReturnCount(String query, String[] selectionArgs) {
         Cursor cursor = null;
         int count = 0;
         try {
-            cursor = database.rawQuery(query, null);
+            cursor = database.rawQuery(query, selectionArgs);
             if (null != cursor) {
                 if (cursor.getCount() > 0) {
                     cursor.moveToFirst();
@@ -1131,7 +1132,7 @@ public class HIA2Service {
                 cursor.close();
             }
         } catch (Exception e) {
-            Log.logError(TAG, e.getMessage());
+            Log.logError(TAG, e.getMessage()+query);
         } finally {
             if (cursor != null) {
                 cursor.close();

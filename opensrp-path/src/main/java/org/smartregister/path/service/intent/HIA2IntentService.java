@@ -3,6 +3,7 @@ package org.smartregister.path.service.intent;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.database.DatabaseUtils;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -127,26 +128,29 @@ public class HIA2IntentService extends IntentService {
 
     private void generateDailyHia2Indicators() {
         SQLiteDatabase tempDB = VaccinatorApplication.getInstance().getRepository().getWritableDatabase();
-        List<String> datesWithEvents = new ArrayList<String>();
+        //remove all existing daily tallies
+        tempDB.execSQL("DELETE FROM daily_tallies;");
+
         try {
             //Cursor daysWithActivitiesCursor = tempDB.rawQuery("Select * FROM event;", null);
+            //Only generate numbers from 4 months ago to date
+            String four_months_ago = DateTime.now().minusMonths(4).toString("YYYY-MM-dd");
 
-            Cursor daysWithActivitiesCursor = tempDB.rawQuery("select distinct strftime('%Y-%m-%d'," + EventClientRepository.event_column.eventDate + ") as eventDate FROM event", null);
+            Log.i(TAG, four_months_ago);
+
+            Cursor daysWithActivitiesCursor = tempDB.rawQuery(
+                    "select distinct strftime('%Y-%m-%d'," + EventClientRepository.event_column.eventDate +
+                            ") as eventDate FROM event WHERE eventDate > strftime('%Y-%m-%d', ?) order by eventDate desc;", new String[]{four_months_ago});
+
             //String[] ExistingTallyDays = hia2ReportRepository.rawQuery(tempDB, HIA2Service.PREVIOUS_REPORT_DATES_QUERY.concat(" order by eventDate asc"));
             if (daysWithActivitiesCursor != null && daysWithActivitiesCursor.moveToFirst()) {
                 do {
-                    String dateofEvent = daysWithActivitiesCursor.getString(0);
-                    //convert this datetime to a date only by splitting on the whitespace and picking the date only. Can be improved
-                    //String[] parts = dateofEvent.split(" ");
-                    //String datePart = parts[0];
-                    String datePart = dateofEvent;
-                    if (!datesWithEvents.contains(datePart)){
-                        datesWithEvents.add(datePart);
-                        Log.d(TAG, datePart);
-                        Map<String, Object> hia2Report = hia2Service.generateIndicators(tempDB, datePart);
-                        dailyTalliesRepository.save(datePart, hia2Report);
-                    }
 
+                    String dateOfEvent = daysWithActivitiesCursor.getString(0);
+                    Log.i(TAG, dateOfEvent);
+                    Map<String, Object> hia2Report = hia2Service.generateIndicators(tempDB, dateOfEvent);
+                    dailyTalliesRepository.save(dateOfEvent, hia2Report);
+                    VaccinatorApplication.getInstance().context().allSharedPreferences().savePreference(HIA2Service.HIA2_LAST_PROCESSED_DATE, dateOfEvent);
                 } while (daysWithActivitiesCursor.moveToNext());
 
             }
@@ -155,31 +159,6 @@ public class HIA2IntentService extends IntentService {
             Log.e(TAG, e.getMessage());
         } finally {
             tempDB.close();
-        }
-
-        try {
-
-            SQLiteDatabase db = VaccinatorApplication.getInstance().getRepository().getWritableDatabase();
-            //get previous dates if shared preferences is null meaning reports for previous months haven't been generated
-            String lastProcessedDate = VaccinatorApplication.getInstance().context().allSharedPreferences().getPreference(HIA2Service.HIA2_LAST_PROCESSED_DATE);
-            ArrayList<HashMap<String, String>> reportDates;
-            if (lastProcessedDate == null || lastProcessedDate.isEmpty()) {
-                reportDates = hia2ReportRepository.rawQuery(db, HIA2Service.PREVIOUS_REPORT_DATES_QUERY.concat(" order by eventDate asc"));
-
-            } else {
-                reportDates = hia2ReportRepository.rawQuery(db, HIA2Service.PREVIOUS_REPORT_DATES_QUERY.concat(" where " + EventClientRepository.event_column.updatedAt + " >'" + lastProcessedDate + "'" + " order by eventDate asc"));
-            }
-            String userName = VaccinatorApplication.getInstance().context().allSharedPreferences().fetchRegisteredANM();
-
-
-            for (Map<String, String> dates : reportDates) {
-                String updatedAt = dates.get(EventClientRepository.event_column.eventDate.name());
-                String date = dates.get(EventClientRepository.event_column.updatedAt.name());
-
-                VaccinatorApplication.getInstance().context().allSharedPreferences().savePreference(HIA2Service.HIA2_LAST_PROCESSED_DATE, updatedAt);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage(), e);
         }
 
     }
